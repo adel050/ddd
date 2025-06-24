@@ -1,35 +1,44 @@
-name: Deploy to GitHub Pages
+# .github/workflows/deploy.yml
+name: Deploy Vite App to GitHub Pages
 
 on:
   push:
-    branches: [ main ]
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
+    branches:
+      - main # تأكد أن هذا هو اسم الفرع الرئيسي لمشروعك (main أو master)
+  workflow_dispatch: # يسمح بتشغيل Workflow يدويًا من GitHub Actions
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-    - run: npm install
-    - run: npm run build
-    - uses: actions/configure-pages@v4
-    - uses: actions/upload-pages-artifact@v3
-      with:
-        path: './dist'
-
-  deploy:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
+
     steps:
-    - id: deployment
-      uses: actions/deploy-pages@v4
+      - name: Checkout repository # خطوة لسحب كود المشروع من GitHub
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js # خطوة لإعداد بيئة Node.js لتشغيل npm
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # إصدار Node.js، 20 هو الأحدث ومناسب
+          cache: 'npm'
+
+      - name: Install dependencies # خطوة لتثبيت الحزم المطلوبة للمشروع
+        run: npm install
+
+      - name: Build project # خطوة لبناء المشروع باستخدام Vite
+        # هذا السكربت موجود في ملف package.json الخاص بك ويستخدم vite.config.static.ts
+        run: npm run build:static
+
+      - name: Setup Pages # خطوة لإعداد خدمة GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact # خطوة لرفع الملفات التي تم بناؤها (من مجلد dist)
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './dist' # مجلد "dist" هو المكان الذي يضع فيه Vite الملفات بعد البناء
+
+      - name: Deploy to GitHub Pages # خطوة لنشر الملفات المرفوعة إلى GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
