@@ -1,27 +1,51 @@
-import { Route, Switch } from "wouter";
-import Home from "./pages/Home";
+import { Switch, Route } from "wouter";
+import { queryClient } from "./lib/queryClient";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "@/components/ui/toaster";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import Navigation from "@/components/Navigation";
+import Footer from "@/components/Footer";
+import Home from "@/pages/Home";
+import Laws from "@/pages/Laws";
+import Contact from "@/pages/Contact";
+import Store from "@/pages/Store";
+import Admin from "@/pages/Admin";
+import Login from "@/pages/Login";
+import OwnerDashboard from "@/pages/OwnerDashboard";
+import SuperAdmin from "@/pages/SuperAdmin";
+import StaticAdmin from "@/pages/StaticAdmin";
+import NotFound from "@/pages/not-found";
+
+function Router() {
+  return (
+    <div className="min-h-screen bg-[var(--qiddiya-darker)] text-[var(--qiddiya-text)] font-arabic">
+      <Navigation />
+      <main>
+        <Switch>
+          <Route path="/" component={Home} />
+          <Route path="/laws" component={Laws} />
+          <Route path="/contact" component={Contact} />
+          <Route path="/store" component={Store} />
+          <Route path="/admin" component={StaticAdmin} />
+          <Route path="/login" component={Login} />
+          <Route path="/owner" component={OwnerDashboard} />
+          <Route path="/super" component={SuperAdmin} />
+          <Route component={NotFound} />
+        </Switch>
+      </main>
+      <Footer />
+    </div>
+  );
+}
 
 function App() {
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
-      <header className="bg-purple-800 p-4">
-        <div className="container mx-auto">
-          <h1 className="text-2xl font-bold text-center">مدينة القدية</h1>
-        </div>
-      </header>
-      
-      <main className="container mx-auto px-4 py-8">
-        <Switch>
-          <Route path="/" component={Home} />
-        </Switch>
-      </main>
-      
-      <footer className="bg-gray-800 p-4 mt-8">
-        <div className="container mx-auto text-center">
-          <p>&copy; 2024 مدينة القدية. جميع الحقوق محفوظة.</p>
-        </div>
-      </footer>
-    </div>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Router />
+      </TooltipProvider>
+    </QueryClientProvider>
   );
 }
 
